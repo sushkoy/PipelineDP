@@ -1,3 +1,4 @@
+
 """ The example of using DPEngine for performing DP aggregation.
 
 Warning: DP aggregations has not been implemented yet, this example is only for
@@ -35,6 +36,10 @@ flags.DEFINE_list('public_partitions', None,
 flags.DEFINE_boolean(
     'private_partitions', False,
     'Output private partitions (do not calculate any DP metrics)')
+flags.DEFINE_boolean(
+    'contribution_bounds_already_enforced', False,
+    'Assume the input dataset already enforces the hard-coded contribution'
+    'bounds. Ignore the user identifiers.')
 
 
 @dataclass
@@ -71,6 +76,7 @@ def calc_dp_rating_metrics(movie_views, ops, public_partitions):
         ],
         max_partitions_contributed=2,
         max_contributions_per_partition=1,
+        contribution_bounds_already_enforced=FLAGS.contribution_bounds_already_enforced,
         low=1,
         high=5,
         public_partitions=public_partitions)
@@ -79,7 +85,7 @@ def calc_dp_rating_metrics(movie_views, ops, public_partitions):
     # element of movie view collection.
     data_extractors = pipeline_dp.DataExtractors(
         partition_extractor=lambda mv: mv.movie_id,
-        privacy_id_extractor=lambda mv: mv.user_id,
+        privacy_id_extractor=(lambda mv: mv.user_id) if not FLAGS.contribution_bounds_already_enforced else None,
         value_extractor=lambda mv: mv.rating)
 
     # Run aggregation.

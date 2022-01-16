@@ -53,6 +53,11 @@ class AggregateParams:
       partition.
     public_partitions: a collection of partition keys that will be present in
       the result.
+    contribution_bounds_already_enforced: assume that the input dataset complies
+      with the bounds provided in max_partitions_contributed and
+      max_contributions_per_partition. This option can be used if the dataset
+      does not contain any identifiers that can be used to enforce contribution
+      bounds automatically.
   """
 
     noise_kind: NoiseKind
@@ -63,6 +68,7 @@ class AggregateParams:
     low: float = None
     high: float = None
     public_partitions: Any = None
+    contribution_bounds_already_enforced: bool = False
 
     def __str__(self):
         return f"Metrics: {[m.value for m in self.metrics]}"
@@ -84,6 +90,7 @@ class SelectPrivatePartitionsParams:
 
     """
     max_partitions_contributed: int
+    # TODO: Add support for contribution_bounds_already_enforced
 
     def __str__(self):
         return "Private Partitions"
